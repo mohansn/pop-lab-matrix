@@ -1,0 +1,188 @@
+/* matops.c :
+ *  Matrix operations - Multiplication, addition, subtraction, transpose
+ *                      and minimum element along the diagonal
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+
+int dim = 3; /* Dimensions dim x dim of matrix */
+
+void accept_user_matrix (double ** mat)
+{
+    int i, j;
+    for (i = 0; i < dim; i++) {
+        for (j = 0; j < dim; j++) {
+            scanf ("%lf", &mat[i][j]);
+        }
+    }
+}
+
+/* Swap two elements of the matrix,
+ * used by the transpose function */
+void swap (double * a, double * b)
+{
+    double temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+/* Set all elements to zero */
+void clear_matrix (double ** matrix)
+{
+    int i, j;
+    for (i = 0; i < dim; i++) {
+        for (j = 0; j < dim; j++) {
+            matrix[i][j] = 0.0;
+        }
+    }
+}
+
+void display (double ** matrix)
+{
+    int i,j;
+    for (i = 0; i < dim; i++) {
+        for (j = 0; j < dim; j++) {
+            printf ("%.2lf\t",  matrix[i][j]);
+            if(j == dim - 1)
+                printf("\n");
+        }
+    }
+}
+
+/* No parameters are needed since we only construct dim x dim matrices */
+double ** allocate_array (void)
+{
+    int i;
+    /* allocate space for the array */
+    double * data = malloc (dim * dim * sizeof(double));
+
+    /* create pointers for the rows starting points */
+    double ** rows = malloc (dim * sizeof(double *));
+    for (i = 0; i < dim; i++) {
+        rows[i] = data + i * dim;
+    }
+    return rows;
+}
+
+/*  Deallocates the memory for a 2D matrix */
+void free_array (double ** mat)
+{
+    free (mat[0]);  /* Free the pointers to the rows */
+    free (mat);     /* Free the memory for the data  */
+}
+
+/* Multiplies two square matrices.
+ * Allocates memory for the result matrix.
+ * The caller is responsible for freeing the memory.
+ */
+double ** multiply (double ** m1, double ** m2)
+{
+    int i, j, k;
+    double ** result = allocate_array();
+    clear_matrix(result);
+    for (i = 0; i < dim; i++) {
+        for (j = 0; j < dim; j++) {
+            for (k = 0; k < dim; k++) {
+                result [i][j] += (m1[i][k] * m2[k][j]);
+            }
+        }
+    }
+    return result;
+}
+
+double ** transpose (double ** mat)
+{
+    int i, j;
+    for (i = 0; i < dim; i++) {
+        for (j = 0; j < i; j++) {
+            swap (&mat[i][j], &mat[j][i]);
+        }
+    }
+    return mat;
+}
+
+/* Returns the minimum element along the diagonal */
+double min_diag (double ** matrix)
+{
+    double min = matrix[0][0];
+    int i;
+
+    for (i = 1 ; i < dim; i++) {
+        if (matrix[i][i] < min) {
+            min = matrix[i][i];
+        }
+    }
+    return min;
+}
+
+double ** add (double ** m1, double ** m2)
+{
+    int i,j;
+    double ** result = allocate_array(); /* Caller must free this */
+    for (i = 0; i < dim; i++) {
+        for (j = 0; j < dim; j++) {
+            result [i][j] = (m1[i][j] + m2[i][j]);
+        }
+    }
+    return result;
+}
+
+double ** sub (double ** m1, double ** m2)
+{
+    int i, j;
+    double ** result = allocate_array(); /* Caller must free this */
+    for (i = 0; i < dim; i++) {
+        for (j = 0; j < dim; j++) {
+            result [i][j] = (m1[i][j] - m2[i][j]);
+        }
+    }
+    return result;
+}
+
+int main (void)
+{
+    double ** m1 = NULL, **m2 = NULL, **result = NULL;
+    printf ("Enter square matrix dimension : ");
+    scanf ("%d", &dim);
+
+    m1=allocate_array();
+    m2=allocate_array();
+
+    printf ("\nEnter first array : ");
+    accept_user_matrix (m1);
+
+    printf ("\nEnter second array : ");
+    accept_user_matrix (m2);
+
+    result = multiply (m1,m2);
+    printf ("The product of the two matrices is : \n");
+    display (result);
+
+    printf ("Transpose of the first matrix is : \n");
+    display (transpose (m1));
+
+    printf ("Transpose of the second matrix is : \n");
+    display (transpose (m2));
+
+    printf ("The minimum element along the diagonal of the first matrix  is %.2lf\n", min_diag (m1));
+    printf ("The minimum element along the diagonal of the second matrix is %.2lf\n", min_diag (m2));
+
+    double ** add_result = add (m1,m2);
+    printf ("The result of addition is : \n");
+    display (add_result);
+
+    double ** sub_result = sub (m1,m2);
+    printf ("The result of subtraction is : \n");
+    display (sub_result);
+
+    free_array (m1);
+    free_array (m2);
+    free_array (result);
+    free_array (add_result);
+    free_array (sub_result);
+
+    return 0;
+}
