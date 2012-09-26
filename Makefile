@@ -4,3 +4,6 @@ matops:matops.c
 .PHONY:clean
 clean:
 	@rm -fv core* *~ matops
+.PHONY:rebuild
+rebuild:
+	make clean all
