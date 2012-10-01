@@ -56,13 +56,12 @@ void display (double ** matrix)
 double ** allocate_array (void)
 {
     int i;
-    /* allocate space for the array */
-    double * data = malloc (dim * dim * sizeof(double));
-
     /* create pointers for the rows starting points */
     double ** rows = malloc (dim * sizeof(double *));
+
+    /* allocate space for each row */
     for (i = 0; i < dim; i++) {
-        rows[i] = data + i * dim;
+        rows[i] = malloc (dim * sizeof(double));
     }
     return rows;
 }
@@ -70,8 +69,11 @@ double ** allocate_array (void)
 /*  Deallocates the memory for a 2D matrix */
 void free_array (double ** mat)
 {
-    free (mat[0]);  /* Free the pointers to the rows */
-    free (mat);     /* Free the memory for the data  */
+    int i;
+    for (i = 0; i < dim; i++) {
+        free (mat[i]);  /* Free the pointers to the rows */
+    }
+    free(mat); /* Free the memory for the rows */
 }
 
 /* Multiplies two square matrices.
