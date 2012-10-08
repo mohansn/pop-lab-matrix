@@ -106,18 +106,16 @@ double ** transpose (double ** mat)
     return mat;
 }
 
-/* Returns the minimum element along the diagonal */
-double min_diag (double ** matrix)
+/* Returns the sum of the elements along the diagonal */
+double sum_diag (double ** matrix)
 {
-    double min = matrix[0][0];
+    double sum = 0;
     int i;
 
-    for (i = 1 ; i < dim; i++) {
-        if (matrix[i][i] < min) {
-            min = matrix[i][i];
-        }
+    for (i = 0 ; i < dim; i++) {
+        sum += matrix[i][i];
     }
-    return min;
+    return sum;
 }
 
 double ** add (double ** m1, double ** m2)
@@ -169,8 +167,8 @@ int main (void)
     printf ("Transpose of the second matrix is : \n");
     display (transpose (m2));
 
-    printf ("The minimum element along the diagonal of the first matrix  is %.2lf\n", min_diag (m1));
-    printf ("The minimum element along the diagonal of the second matrix is %.2lf\n", min_diag (m2));
+    printf ("The sum of the diagonal elements of the first matrix  is %.2lf\n", sum_diag (m1));
+    printf ("The sum of the diagonal elements of the second matrix is %.2lf\n", sum_diag (m2));
 
     double ** add_result = add (m1,m2);
     printf ("The result of addition is : \n");
